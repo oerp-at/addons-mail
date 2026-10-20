@@ -30,6 +30,10 @@ Separate To, Cc and Bcc recipients in the mail composer (`mail.compose.message`)
 - Logic depends on the order of mails produced by `mail.mail._prepare_outgoing_list` and
   on the `recipients` list popped in `ir.mail_server`; core changes in these methods
   break it silently. Check them first on every migration.
+- `_compute_partner_ids` is a copy of the core method without `email_cc`.
+  `test_MailComposer_upstream_file_hash` fails when core changes it: port the core diff
+  into the copy, then add the new md5 to `VALID_HASHES` (keep the old ones for older
+  Odoo/OCB builds).
 - Odoo 20.0 core has its own Cc (`partner_cc_ids` on the composer, `partner_cc` on
   templates, `recipient_cc_ids` on `mail.mail`). Field names overlap with this module,
   so a 20.0 port must build on core Cc and only add Bcc and company defaults.
