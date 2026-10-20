@@ -91,10 +91,15 @@ class MailComposeMessage(models.TransientModel):
         return: field Recipients filled with value from 'email_to', 'partner_ids'
         """
         for composer in self:
+            template = composer.template_id
+            # Use template in comment mode only if there are no partners yet or if
+            # the template specifies different ones, as suggested recipients should
+            # normally not change and we don't want to re-add them every time
             if (
-                composer.template_id
+                template
                 and composer.composition_mode == "comment"
                 and not composer.composition_batch
+                and (not template.use_default_to or not composer.partner_ids)
             ):
                 res_ids = composer._evaluate_res_ids() or [0]
                 rendered_values = composer._generate_template_for_composer(
